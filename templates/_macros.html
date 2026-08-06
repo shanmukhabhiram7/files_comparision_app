@@ -1,0 +1,22 @@
+{#- File uploader markup, matching Streamlit's st.file_uploader appearance -#}
+{% macro uploader(field, label_tpl, side, accept, type_hint, max_mb) -%}
+<div class="st-uploader" data-field="{{ field }}" data-accept="{{ accept }}">
+    <span class="widget-label" data-label-tpl="{{ label_tpl }}" data-side="{{ side }}"></span>
+    <div class="st-uploader-dropzone">
+        <div class="st-uploader-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        </div>
+        <div class="st-uploader-instructions">
+            <div class="st-uploader-main">Drag and drop file here</div>
+            <div class="st-uploader-sub">Limit {{ max_mb }}MB per file{% if type_hint %} • {{ type_hint }}{% endif %}</div>
+        </div>
+        <button type="button" class="st-button browse-button">Browse files</button>
+        <input type="file" class="st-uploader-input"{% if accept %} accept="{{ accept }}"{% endif %}>
+    </div>
+    <div class="st-uploader-selected"></div>
+</div>
+{%- endmacro %}

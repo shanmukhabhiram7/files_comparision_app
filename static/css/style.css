@@ -1,0 +1,870 @@
+/* ==========================================================================
+   File, Folder & ZIP Compare — Flask edition
+   --------------------------------------------------------------------------
+   Section 1 recreates the Streamlit widget appearance (theme values taken from
+   the old .streamlit/config.toml).
+   Section 2 is the original app CSS, copied verbatim from the Streamlit build.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Streamlit-equivalent base and widgets
+   ========================================================================== */
+
+:root {
+    --primary-color: #2563EB;
+    --primary-color-hover: #1d4ed8;
+    --primary-color-active: #1e40af;
+    --background-color: #FFFFFF;
+    --secondary-background-color: #F8FAFC;
+    --text-color: #111827;
+    --fade-text-color: rgba(49, 51, 63, 0.6);
+    --border-color: rgba(49, 51, 63, 0.2);
+    --font: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-color);
+    background: var(--background-color);
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-shell {
+    width: 100%;
+}
+
+/* Streamlit's centred content column ------------------------------------- */
+.block-container {
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
+
+@media (max-width: 900px) {
+    .block-container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+/* Vertical rhythm between stacked elements, like Streamlit's 1rem gap ----- */
+.stack > * {
+    margin-bottom: 1rem;
+}
+
+.stack > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Columns ---------------------------------------------------------------- */
+.st-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.st-col {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+@media (max-width: 730px) {
+    .st-columns {
+        flex-direction: column;
+    }
+}
+
+/* Headings --------------------------------------------------------------- */
+.st-subheader {
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    color: var(--text-color);
+    padding: 0.5rem 0 1rem 0;
+    margin: 0;
+    scroll-margin-top: 3rem;
+}
+
+.st-caption {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--fade-text-color);
+    margin: 0 0 1rem 0;
+}
+
+/* Divider ---------------------------------------------------------------- */
+.st-divider {
+    border: none;
+    border-top: 1px solid rgba(49, 51, 63, 0.2);
+    margin: 2rem 0;
+}
+
+/* Widget labels ---------------------------------------------------------- */
+.widget-label {
+    display: block;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+/* Radio group ------------------------------------------------------------ */
+.st-radio-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+    align-items: center;
+}
+
+.st-radio-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    user-select: none;
+    padding: 0.15rem 0;
+}
+
+.st-radio-option input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.st-radio-option input[type="radio"]:checked {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    box-shadow: inset 0 0 0 3px var(--background-color);
+}
+
+.st-radio-option input[type="radio"]:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Checkbox --------------------------------------------------------------- */
+.st-checkbox {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    user-select: none;
+}
+
+.st-checkbox input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    margin-top: 0.28rem;
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    background: var(--background-color);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.st-checkbox input[type="checkbox"]:checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.st-checkbox input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4.5px;
+    top: 1px;
+    width: 4px;
+    height: 9px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(43deg);
+}
+
+.st-checkbox input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.st-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    margin-left: 0.35rem;
+    border-radius: 50%;
+    background: rgba(49, 51, 63, 0.2);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+    cursor: help;
+    vertical-align: 2px;
+}
+
+/* Text input ------------------------------------------------------------- */
+.st-text-input input {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-color);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    outline: none;
+    transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.st-text-input input::placeholder {
+    color: rgba(49, 51, 63, 0.45);
+}
+
+.st-text-input input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* Text area -------------------------------------------------------------- */
+.st-text-area textarea {
+    display: block;
+    width: 100%;
+    min-height: 18rem;
+    resize: vertical;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    outline: none;
+    transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.st-text-area textarea::placeholder {
+    color: rgba(49, 51, 63, 0.45);
+}
+
+.st-text-area textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* Buttons ---------------------------------------------------------------- */
+.st-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+    padding: 0.25rem 0.75rem;
+    min-height: 2.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    color: var(--text-color);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+}
+
+.st-button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.st-button:active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.st-button.primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+    font-weight: 400;
+}
+
+.st-button.primary:hover {
+    background: var(--primary-color-hover);
+    border-color: var(--primary-color-hover);
+    color: #ffffff;
+}
+
+.st-button.primary:active {
+    background: var(--primary-color-active);
+    border-color: var(--primary-color-active);
+}
+
+.st-button.full-width {
+    width: 100%;
+}
+
+.st-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.st-button:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* File uploader ---------------------------------------------------------- */
+.st-uploader-dropzone {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(49, 51, 63, 0.08);
+    transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.st-uploader-dropzone.dragover {
+    border-color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.st-uploader-icon {
+    flex: 0 0 auto;
+    color: rgba(49, 51, 63, 0.6);
+    display: flex;
+    align-items: center;
+}
+
+.st-uploader-instructions {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.st-uploader-main {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.st-uploader-sub {
+    font-size: 0.8rem;
+    color: var(--fade-text-color);
+    line-height: 1.4;
+}
+
+.st-uploader-input {
+    display: none;
+}
+
+.st-uploaded-file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.25rem 0.4rem 0.25rem;
+    margin-top: 0.35rem;
+    border-bottom: 1px solid rgba(49, 51, 63, 0.08);
+    font-size: 0.875rem;
+    color: var(--text-color);
+}
+
+.st-uploaded-file .file-icon {
+    flex: 0 0 auto;
+    color: rgba(49, 51, 63, 0.6);
+    display: flex;
+    align-items: center;
+}
+
+.st-uploaded-file .file-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.st-uploaded-file .file-size {
+    flex: 0 0 auto;
+    color: var(--fade-text-color);
+    font-size: 0.8rem;
+}
+
+.st-uploaded-file .file-remove {
+    flex: 0 0 auto;
+    border: none;
+    background: transparent;
+    color: rgba(49, 51, 63, 0.6);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 0.25rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.st-uploaded-file .file-remove:hover {
+    color: #ff4b4b;
+    background: rgba(255, 75, 75, 0.1);
+}
+
+/* Alerts ----------------------------------------------------------------- */
+.st-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+}
+
+.st-alert:last-child {
+    margin-bottom: 0;
+}
+
+.st-alert .st-alert-icon {
+    flex: 0 0 auto;
+    line-height: 1.6;
+}
+
+.st-alert .st-alert-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.st-alert.success {
+    background: rgba(33, 195, 84, 0.1);
+    color: rgb(23, 114, 51);
+}
+
+.st-alert.info {
+    background: rgba(28, 131, 225, 0.1);
+    color: rgb(0, 66, 128);
+}
+
+.st-alert.warning {
+    background: rgba(255, 227, 18, 0.1);
+    color: rgb(146, 108, 5);
+}
+
+.st-alert.error {
+    background: rgba(255, 43, 43, 0.09);
+    color: rgb(125, 53, 59);
+}
+
+.st-alert.exception {
+    display: block;
+    background: rgba(255, 43, 43, 0.09);
+    color: rgb(125, 53, 59);
+}
+
+.st-alert.exception .exception-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.st-alert.exception pre {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Spinner ---------------------------------------------------------------- */
+.st-spinner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    color: var(--fade-text-color);
+    font-size: 1rem;
+}
+
+.st-spinner .spinner-ring {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 3px solid rgba(37, 99, 235, 0.2);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: st-spin 0.8s linear infinite;
+}
+
+@keyframes st-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dataframe -------------------------------------------------------------- */
+.st-dataframe {
+    width: 100%;
+    border: 1px solid rgba(49, 51, 63, 0.15);
+    border-radius: 0.5rem;
+    overflow: auto;
+    max-height: 25rem;
+    background: var(--background-color);
+    margin-bottom: 1rem;
+}
+
+.st-dataframe table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    font-family: var(--font);
+    color: var(--text-color);
+}
+
+.st-dataframe thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--secondary-background-color);
+    color: var(--fade-text-color);
+    font-weight: 400;
+    text-align: left;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid rgba(49, 51, 63, 0.15);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.st-dataframe thead th:hover {
+    color: var(--text-color);
+}
+
+.st-dataframe thead th .sort-arrow {
+    margin-left: 0.3rem;
+    font-size: 0.7rem;
+    opacity: 0;
+}
+
+.st-dataframe thead th.sorted .sort-arrow {
+    opacity: 1;
+}
+
+.st-dataframe tbody td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid rgba(49, 51, 63, 0.08);
+    vertical-align: top;
+    word-break: break-word;
+}
+
+.st-dataframe tbody tr:hover td {
+    background: rgba(37, 99, 235, 0.04);
+}
+
+.st-dataframe tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.st-dataframe col.col-large {
+    width: 55%;
+}
+
+/* Expander --------------------------------------------------------------- */
+.st-expander {
+    border: 1px solid rgba(49, 51, 63, 0.2);
+    border-radius: 0.5rem;
+    background: var(--background-color);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.st-expander > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.st-expander > summary::-webkit-details-marker {
+    display: none;
+}
+
+.st-expander > summary::after {
+    content: "⌄";
+    margin-left: auto;
+    color: var(--fade-text-color);
+    font-size: 1.1rem;
+    line-height: 1;
+    transform: translateY(-3px);
+    transition: transform 0.15s ease;
+}
+
+.st-expander[open] > summary::after {
+    transform: rotate(180deg) translateY(-1px);
+}
+
+.st-expander .expander-body {
+    padding: 0 1rem 1rem 1rem;
+}
+
+.st-expander .expander-body ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.st-expander .expander-body li {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.st-expander .expander-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85em;
+    color: rgb(9, 171, 59);
+    background: rgba(9, 171, 59, 0.1);
+    border-radius: 0.25rem;
+    padding: 0.15em 0.35em;
+    word-break: break-word;
+}
+
+/* ==========================================================================
+   2. Original app CSS — copied verbatim from the Streamlit build
+   ========================================================================== */
+
+/* Extra top spacing and line height prevent the page heading from being cropped. */
+.block-container {
+    max-width: 1500px;
+    padding-top: 2.7rem;
+    padding-bottom: 2rem;
+}
+.main-title {
+    display: block;
+    overflow: visible;
+    font-size: 2.05rem;
+    font-weight: 760;
+    line-height: 1.28;
+    padding-top: 0.15rem;
+    margin: 0 0 0.2rem 0;
+}
+.sub-title {color: #667085; margin-bottom: 1.25rem;}
+
+.summary-card {
+    border: 1px solid #dfe3e8;
+    border-radius: 14px;
+    padding: 15px 17px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(16,24,40,.06);
+}
+.summary-label {font-size: .82rem; color: #667085; margin-bottom: 5px;}
+.summary-number {font-size: 1.65rem; font-weight: 760;}
+.green {color: #137333;}
+.red {color: #b00020;}
+.amber {color: #9a5200;}
+
+.mismatch-accordion {margin-top: 0.45rem;}
+.mismatch-panel {
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+    background: #ffffff;
+    margin-bottom: 0.65rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(16,24,40,.06);
+}
+.mismatch-panel[open] {
+    border-color: #98a2b3;
+    box-shadow: 0 2px 8px rgba(16,24,40,.09);
+}
+.mismatch-panel summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 0.78rem 0.95rem;
+    font-weight: 650;
+    color: #1d2939;
+    background: #ffffff;
+    border-bottom: 1px solid transparent;
+    user-select: none;
+}
+.mismatch-panel summary::-webkit-details-marker {display: none;}
+.mismatch-panel summary::before {
+    content: "›";
+    display: inline-block;
+    margin-right: 0.58rem;
+    color: #667085;
+    font-size: 1.15rem;
+    transform-origin: center;
+    transition: transform .12s ease;
+}
+.mismatch-panel[open] summary::before {transform: rotate(90deg);}
+.mismatch-panel[open] summary {
+    background: #f8fafc;
+    border-bottom-color: #d0d5dd;
+}
+.mismatch-content {
+    padding: 0.85rem 0.9rem 1rem 0.9rem;
+    background: #ffffff;
+}
+.mismatch-message {color: #475467; margin: 0 0 0.75rem 0;}
+.binary-note {
+    padding: 0.75rem 0.85rem;
+    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid #d0d5dd;
+    color: #344054;
+}
+
+.diff-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1.1rem;
+    margin: 0 0 0.65rem 0;
+    color: #475467;
+    font-size: 0.82rem;
+}
+.legend-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 10px;
+    margin-right: 5px;
+    border: 1px solid #cbd5e1;
+    vertical-align: -1px;
+}
+.legend-changed {background: #fff3bf;}
+.legend-removed {background: #ffe3e3;}
+.legend-added {background: #dff7e5;}
+
+.diff-wrap {
+    overflow: auto;
+    max-height: 680px;
+    border: 1px solid #b8c0cc;
+    border-radius: 6px;
+    background: #ffffff;
+}
+.diff-table {
+    width: 100%;
+    min-width: 960px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12.5px;
+    color: #1f2937;
+    background: #ffffff;
+}
+.diff-table col.line-column {width: 54px;}
+.diff-table col.content-column {width: calc(50% - 54px);}
+.diff-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f1f3f5;
+    color: #172033;
+    text-align: left;
+    padding: 8px 8px;
+    border-bottom: 1px solid #aeb7c4;
+}
+.diff-table td {
+    vertical-align: top;
+    padding: 4px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.42;
+    color: #1f2937;
+}
+.diff-table th:nth-child(3),
+.diff-table td:nth-child(3) {
+    border-left: 3px solid #c4cad3;
+}
+.line-no {
+    color: #667085 !important;
+    text-align: right;
+    background: #f6f7f9;
+    border-right: 1px solid #d0d5dd;
+    user-select: none;
+    font-weight: 500;
+}
+.same {background: #ffffff;}
+.changed-left, .changed-right {
+    background: #fff3bf;
+    box-shadow: inset 3px 0 0 #e9c46a;
+}
+.removed {
+    background: #ffe3e3;
+    box-shadow: inset 3px 0 0 #e6a0a0;
+}
+.added {
+    background: #dff7e5;
+    box-shadow: inset 3px 0 0 #8fd1a3;
+}
+.missing-cell {background: #f8f9fa;}
+
+.inline-removed {
+    background: #ffc9c9;
+    color: #7f1d1d;
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: 650;
+}
+.inline-added {
+    background: #b7ebc6;
+    color: #14532d;
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: 650;
+}
+.space-token {
+    display: inline-block;
+    color: #315b85;
+    background: #e6f0ff;
+    border-radius: 2px;
+    padding: 0 1px;
+    margin: 0;
+    font-weight: 700;
+}

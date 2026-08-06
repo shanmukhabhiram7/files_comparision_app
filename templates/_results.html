@@ -1,0 +1,121 @@
+{#- Port of render_result() from the Streamlit app. Element order is unchanged. -#}
+
+{%- macro summary_card(label, value, color_class) -%}
+<div class='summary-card'><div class='summary-label'>{{ label }}</div><div class='summary-number {{ color_class }}'>{{ value }}</div></div>
+{%- endmacro -%}
+
+{%- macro missing_table(title, items, side) -%}
+{%- if items -%}
+<h3 class="st-subheader">{{ title }}</h3>
+<div class="st-dataframe" data-sortable="1">
+    <table>
+        <thead>
+            <tr>
+                <th data-column="0">Path<span class="sort-arrow">▲</span></th>
+                <th data-column="1">Found only in<span class="sort-arrow">▲</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {%- for item in items %}
+            <tr><td>{{ item }}</td><td>{{ side }}</td></tr>
+            {%- endfor %}
+        </tbody>
+    </table>
+</div>
+{%- endif -%}
+{%- endmacro -%}
+
+<hr class="st-divider">
+
+{# Show visible mismatches first, similar to a desktop comparison tool. #}
+{% if result.mismatched_files %}
+    <h3 class="st-subheader">Mismatch Details</h3>
+    <div class="st-caption">Side-by-side content comparison. The first mismatch is opened automatically; opening another file closes the previous one.</div>
+    {{ mismatch_html|safe }}
+{% else %}
+    <div class="st-alert success">
+        <span class="st-alert-icon">✅</span>
+        <div class="st-alert-body">No content mismatches were found in the common files.</div>
+    </div>
+{% endif %}
+
+<h3 class="st-subheader">Home / Comparison Summary</h3>
+
+<div class="st-columns">
+    <div class="st-col">{{ summary_card('Matched files', result.matched_files|length, 'green') }}</div>
+    <div class="st-col">{{ summary_card('Mismatched files', result.mismatched_files|length, 'red') }}</div>
+    <div class="st-col">{{ summary_card('Missing files/folders', missing_total, 'amber') }}</div>
+    <div class="st-col">{{ summary_card('Common files compared', result.total_common_files, '') }}</div>
+</div>
+
+<div style="height:1rem"></div>
+
+{% if missing_total %}
+    <div class="st-alert warning">
+        <span class="st-alert-icon">⚠️</span>
+        <div class="st-alert-body">Missing items were found. Common files were still compared normally.</div>
+    </div>
+    <div class="st-columns">
+        <div class="st-col">
+            {{ missing_table('Only in ' ~ left_label ~ ' — Files', result.only_in_left_files, left_label) }}
+            {{ missing_table('Only in ' ~ left_label ~ ' — Folders', result.only_in_left_folders, left_label) }}
+        </div>
+        <div class="st-col">
+            {{ missing_table('Only in ' ~ right_label ~ ' — Files', result.only_in_right_files, right_label) }}
+            {{ missing_table('Only in ' ~ right_label ~ ' — Folders', result.only_in_right_folders, right_label) }}
+        </div>
+    </div>
+{% else %}
+    <div class="st-alert success">
+        <span class="st-alert-icon">✅</span>
+        <div class="st-alert-body">No files or folders are missing.</div>
+    </div>
+{% endif %}
+
+<h3 class="st-subheader">File Results</h3>
+
+{% if rows %}
+    <div class="st-dataframe" data-sortable="1">
+        <table>
+            <colgroup>
+                <col class="col-large">
+                <col>
+                <col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th data-column="0">File / path<span class="sort-arrow">▲</span></th>
+                    <th data-column="1">Status<span class="sort-arrow">▲</span></th>
+                    <th data-column="2">Details<span class="sort-arrow">▲</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {%- for row in rows %}
+                <tr>
+                    <td>{{ row.file }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.details }}</td>
+                </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="st-alert info">
+        <span class="st-alert-icon">ℹ️</span>
+        <div class="st-alert-body">There are no common files to compare.</div>
+    </div>
+{% endif %}
+
+{% if result.matched_files %}
+<details class="st-expander">
+    <summary>🟢 Matched files</summary>
+    <div class="expander-body">
+        <ul>
+            {%- for item in result.matched_files %}
+            <li><code>{{ item.relative_path }}</code> — {{ item.message }}</li>
+            {%- endfor %}
+        </ul>
+    </div>
+</details>
+{% endif %}

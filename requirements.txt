@@ -1,0 +1,3 @@
+Flask>=3.0
+# Optional production WSGI server (works on Windows and Linux).
+waitress>=3.0

@@ -1,0 +1,167 @@
+{% from "_macros.html" import uploader %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File &amp; Folder Compare</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+<div class="block-container">
+
+    <div class='main-title'>File, Folder &amp; ZIP Compare</div>
+    <div class='sub-title'>Compare matching folder structures, detect missing items, and inspect line-level differences.</div>
+
+    <form id="compare-form" class="stack" autocomplete="off" onsubmit="return false;">
+
+        <!-- Comparison type ------------------------------------------------ -->
+        <div>
+            <span class="widget-label">Comparison type</span>
+            <div class="st-radio-group">
+                <label class="st-radio-option">
+                    <input type="radio" name="mode" value="ZIP vs ZIP" checked>
+                    <span>ZIP vs ZIP</span>
+                </label>
+                <label class="st-radio-option">
+                    <input type="radio" name="mode" value="Folder vs Folder">
+                    <span>Folder vs Folder</span>
+                </label>
+                <label class="st-radio-option">
+                    <input type="radio" name="mode" value="File vs File">
+                    <span>File vs File</span>
+                </label>
+                <label class="st-radio-option">
+                    <input type="radio" name="mode" value="Text vs Text">
+                    <span>Text vs Text</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Options -------------------------------------------------------- -->
+        <div class="st-columns">
+            <div class="st-col">
+                <label class="st-checkbox">
+                    <input type="checkbox" id="semantic-json" checked>
+                    <span>Treat JSON with the same data as matched, even if formatting or key order differs</span>
+                </label>
+            </div>
+            <div class="st-col">
+                <label class="st-checkbox">
+                    <input type="checkbox" id="show-spaces">
+                    <span>Show spaces in the comparison<span class="st-help" title="Spaces appear as · in the side-by-side comparison.">?</span></span>
+                </label>
+            </div>
+        </div>
+
+        <div>
+            <label class="st-checkbox">
+                <input type="checkbox" id="use-custom-labels">
+                <span>Use custom labels instead of Left and Right</span>
+            </label>
+        </div>
+
+        <div class="st-columns hidden" id="custom-label-row">
+            <div class="st-col">
+                <div class="st-text-input">
+                    <label class="widget-label" for="custom-left-label">First file/folder label</label>
+                    <input type="text" id="custom-left-label" value="Source" placeholder="Example: Development">
+                </div>
+            </div>
+            <div class="st-col">
+                <div class="st-text-input">
+                    <label class="widget-label" for="custom-right-label">Second file/folder label</label>
+                    <input type="text" id="custom-right-label" value="Target" placeholder="Example: Production">
+                </div>
+            </div>
+        </div>
+
+        <!-- ZIP vs ZIP ----------------------------------------------------- -->
+        <div class="stack mode-panel" data-mode="ZIP vs ZIP">
+            <div class="st-columns">
+                <div class="st-col">
+                    {{ uploader('left_zip', '{label} ZIP', 'left', '.zip', 'ZIP', max_upload_mb) }}
+                </div>
+                <div class="st-col">
+                    {{ uploader('right_zip', '{label} ZIP', 'right', '.zip', 'ZIP', max_upload_mb) }}
+                </div>
+            </div>
+            <button type="button" class="st-button primary full-width" data-action="compare">Compare ZIP files</button>
+        </div>
+
+        <!-- Folder vs Folder ------------------------------------------------ -->
+        <div class="stack mode-panel hidden" data-mode="Folder vs Folder">
+            <div class="st-alert info">
+                <span class="st-alert-icon">ℹ️</span>
+                <div class="st-alert-body">Folder mode compares two folders available on the computer running this app.</div>
+            </div>
+            <div class="st-columns">
+                <div class="st-col">
+                    <div class="st-text-input">
+                        <label class="widget-label" for="left-folder" data-label-tpl="{label} folder path" data-side="left">Left folder path</label>
+                        <input type="text" id="left-folder" placeholder="C:\Projects\version_1">
+                    </div>
+                </div>
+                <div class="st-col">
+                    <div class="st-text-input">
+                        <label class="widget-label" for="right-folder" data-label-tpl="{label} folder path" data-side="right">Right folder path</label>
+                        <input type="text" id="right-folder" placeholder="C:\Projects\version_2">
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="st-button primary full-width" data-action="compare">Compare folders</button>
+        </div>
+
+        <!-- File vs File ---------------------------------------------------- -->
+        <div class="stack mode-panel hidden" data-mode="File vs File">
+            <div class="st-columns">
+                <div class="st-col">
+                    {{ uploader('left_file', '{label} file', 'left', '', '', max_upload_mb) }}
+                </div>
+                <div class="st-col">
+                    {{ uploader('right_file', '{label} file', 'right', '', '', max_upload_mb) }}
+                </div>
+            </div>
+            <button type="button" class="st-button primary full-width" data-action="compare">Compare files</button>
+        </div>
+
+        <!-- Text vs Text ---------------------------------------------------- -->
+        <div class="stack mode-panel hidden" data-mode="Text vs Text">
+            <div class="st-columns">
+                <div class="st-col">
+                    <div class="st-text-area">
+                        <label class="widget-label" for="left-text" data-label-tpl="{label} text" data-side="left">Source text</label>
+                        <textarea id="left-text" spellcheck="false" placeholder="Paste source text here..."></textarea>
+                    </div>
+                </div>
+                <div class="st-col">
+                    <div class="st-text-area">
+                        <label class="widget-label" for="right-text" data-label-tpl="{label} text" data-side="right">Target text</label>
+                        <textarea id="right-text" spellcheck="false" placeholder="Paste target text here..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="st-button primary full-width" data-action="compare">Compare text</button>
+        </div>
+
+        <!-- Status --------------------------------------------------------- -->
+        <div id="status-area"></div>
+    </form>
+
+    <div id="results-area"></div>
+
+</div>
+</div>
+
+<script>
+    window.APP_CONFIG = {
+        compareUrl: "{{ url_for('api_compare') }}",
+        renderUrl: "{{ url_for('api_render') }}",
+        maxUploadMb: {{ max_upload_mb }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
