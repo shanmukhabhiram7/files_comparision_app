@@ -40,6 +40,8 @@ app.py                  Flask routes and request handling
 comparison_engine.py    Comparison logic (unchanged from the Streamlit build)
 diff_render.py          Side-by-side diff and mismatch accordion HTML
 result_store.py         Per-session result cache (replaces st.session_state)
+shared_result_store.py  Last-5 shared-result storage (Redis/KV + local fallback)
+pdf_report.py           Overview-only PDF report generation
 templates/              index.html, _results.html, _macros.html
 static/css/style.css    All styling, including the original app CSS
 static/js/app.js        Uploaders, reactive re-render, table sorting
@@ -205,8 +207,49 @@ python test_engine.py
 
 - ZIP mode uploads two ZIP files through the interface.
 - File mode uploads two files through the interface.
-- Text mode accepts pasted source and target text and uses the same comparison results and side-by-side mismatch view.
 - Folder mode accepts two local folder paths because browser uploads do not reliably retain recursive folder structures. The paths are read on the machine **running the app**, so keep the app bound to `127.0.0.1` unless you trust everyone who can reach it.
 - Uploads are limited to 500MB per file, matching the old Streamlit setting.
 - Refreshing the page clears the current result, exactly as the Streamlit version did.
 - Very large text-file differences may require more browser memory.
+
+## Share links and PDF reports
+
+After a comparison completes, the result area includes:
+
+- **Share** - creates a view-only link containing the complete detailed result, including mismatch side-by-side details.
+- **Download PDF** - downloads an overview report containing only:
+  - Mismatch Details (file/path and mismatch description only)
+  - Home / Comparison Summary
+  - File Results
+
+The PDF intentionally does **not** include source code, file contents, or side-by-side diff text.
+
+### Last 5 shared results
+
+The application retains only the latest **5 shared results**. When a 6th result is shared, the oldest shared result is deleted and its old link becomes unavailable.
+
+### Vercel persistent share storage
+
+Vercel serverless instances do not provide durable local filesystem or process memory. For share links to remain available reliably across requests/deployments, connect an Upstash Redis / Vercel Marketplace Redis database and expose either of these environment-variable pairs:
+
+```text
+KV_REST_API_URL
+KV_REST_API_TOKEN
+```
+
+or:
+
+```text
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
+```
+
+No extra Python Redis package is required; this project uses the provider's REST API.
+
+Also configure a stable Flask secret in Vercel:
+
+```text
+SECRET_KEY=<a-long-random-secret>
+```
+
+Without Redis/KV, share links use a local temporary-file fallback for local development. That fallback is not durable on Vercel.
