@@ -262,33 +262,6 @@ body {
     box-shadow: 0 0 0 1px var(--primary-color);
 }
 
-/* Text area -------------------------------------------------------------- */
-.st-text-area textarea {
-    display: block;
-    width: 100%;
-    min-height: 18rem;
-    resize: vertical;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--text-color);
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    outline: none;
-    transition: border-color 0.1s ease, box-shadow 0.1s ease;
-}
-
-.st-text-area textarea::placeholder {
-    color: rgba(49, 51, 63, 0.45);
-}
-
-.st-text-area textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 1px var(--primary-color);
-}
-
 /* Buttons ---------------------------------------------------------------- */
 .st-button {
     display: inline-flex;
@@ -867,4 +840,99 @@ body {
     padding: 0 1px;
     margin: 0;
     font-weight: 700;
+}
+
+/* Text comparison -------------------------------------------------------- */
+.st-text-area textarea {
+    display: block;
+    width: 100%;
+    min-height: 18rem;
+    resize: vertical;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    outline: none;
+}
+
+.st-text-area textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* Share and PDF actions -------------------------------------------------- */
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: flex-end;
+    margin: 0 0 1rem 0;
+}
+
+.action-button {
+    min-width: 8.5rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.share-link-panel {
+    border: 1px solid #d0d5dd;
+    border-radius: 0.55rem;
+    background: #f8fafc;
+    padding: 0.85rem;
+    margin: 0 0 1rem 0;
+}
+
+.share-link-title {
+    font-weight: 600;
+    margin-bottom: 0.45rem;
+}
+
+.share-link-row {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.share-link-row input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #d0d5dd;
+    border-radius: 0.45rem;
+    padding: 0.55rem 0.65rem;
+    background: #fff;
+    color: #111827;
+}
+
+.share-retention-note {
+    margin: 0.5rem 0 0 0;
+}
+
+.shared-page-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.share-unavailable-page {
+    padding-top: 5rem;
+}
+
+@media (max-width: 730px) {
+    .share-link-row,
+    .shared-page-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .result-actions {
+        justify-content: stretch;
+    }
+    .result-actions .st-button {
+        flex: 1 1 auto;
+    }
 }
