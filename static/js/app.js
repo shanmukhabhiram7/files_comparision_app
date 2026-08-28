@@ -298,6 +298,7 @@
     function setResultsHtml(html) {
         resultsArea.innerHTML = html;
         initSortableTables(resultsArea);
+        initResultActions(resultsArea);
     }
 
     /* ------------------------------------------------------------------ */
@@ -316,6 +317,121 @@
         data.append("left_label", current.left);
         data.append("right_label", current.right);
         return data;
+    }
+
+    function copyText(value) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(value);
+        }
+        return new Promise(function (resolve, reject) {
+            var helper = document.createElement("textarea");
+            helper.value = value;
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.appendChild(helper);
+            helper.select();
+            try {
+                document.execCommand("copy") ? resolve() : reject(new Error("Copy failed"));
+            } catch (error) {
+                reject(error);
+            } finally {
+                document.body.removeChild(helper);
+            }
+        });
+    }
+
+    function initResultActions(root) {
+        var shareButton = root.querySelector('[data-action="share-result"]');
+        var downloadButton = root.querySelector('[data-action="download-pdf"]');
+        var copyButton = root.querySelector('[data-action="copy-share-link"]');
+
+        if (shareButton) {
+            shareButton.addEventListener("click", function () {
+                if (busy) return;
+                busy = true;
+                shareButton.disabled = true;
+                var originalText = shareButton.textContent;
+                shareButton.textContent = "Creating link...";
+                fetch(CONFIG.shareUrl, { method: "POST", body: displayOptionsPayload() })
+                    .then(function (response) { return response.json(); })
+                    .then(function (payload) {
+                        if (payload.status !== "ok") {
+                            throw new Error(payload.message || "Could not create the share link.");
+                        }
+                        var panel = root.querySelector("[data-share-panel]");
+                        var input = root.querySelector("[data-share-link]");
+                        if (panel && input) {
+                            input.value = payload.share_url;
+                            panel.classList.remove("hidden");
+                        }
+                        copyText(payload.share_url).then(function () {
+                            shareButton.textContent = "Link copied";
+                            window.setTimeout(function () {
+                                shareButton.textContent = originalText;
+                            }, 1600);
+                        }).catch(function () {
+                            shareButton.textContent = originalText;
+                        });
+                    })
+                    .catch(function (error) {
+                        showAlert("error", error.message);
+                        shareButton.textContent = originalText;
+                    })
+                    .finally(function () {
+                        busy = false;
+                        shareButton.disabled = false;
+                    });
+            });
+        }
+
+        if (copyButton) {
+            copyButton.addEventListener("click", function () {
+                var input = root.querySelector("[data-share-link]");
+                if (!input || !input.value) return;
+                copyText(input.value).then(function () {
+                    var original = copyButton.textContent;
+                    copyButton.textContent = "Copied";
+                    window.setTimeout(function () { copyButton.textContent = original; }, 1200);
+                });
+            });
+        }
+
+        if (downloadButton) {
+            downloadButton.addEventListener("click", function () {
+                if (busy) return;
+                busy = true;
+                downloadButton.disabled = true;
+                var originalText = downloadButton.textContent;
+                downloadButton.textContent = "Preparing PDF...";
+                fetch(CONFIG.downloadPdfUrl, { method: "POST", body: displayOptionsPayload() })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            return response.json().then(function (payload) {
+                                throw new Error(payload.message || "Could not create the PDF.");
+                            });
+                        }
+                        return response.blob();
+                    })
+                    .then(function (blob) {
+                        var url = URL.createObjectURL(blob);
+                        var link = document.createElement("a");
+                        link.href = url;
+                        link.download = "comparison_report.pdf";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    })
+                    .catch(function (error) {
+                        showAlert("error", error.message);
+                    })
+                    .finally(function () {
+                        busy = false;
+                        downloadButton.disabled = false;
+                        downloadButton.textContent = originalText;
+                    });
+            });
+        }
     }
 
     function rerenderStoredResult() {
@@ -346,6 +462,7 @@
 
         var mode = currentMode();
         var data = displayOptionsPayload();
+        data.append("mode", mode);
         data.append("semantic_json", semanticJson.checked ? "true" : "false");
 
         var spinnerMessage;
