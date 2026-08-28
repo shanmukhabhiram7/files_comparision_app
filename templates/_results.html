@@ -27,6 +27,25 @@
 
 <hr class="st-divider">
 
+{% if shared_view %}
+<div class="result-actions shared-actions">
+    <a class="st-button secondary action-button" href="{{ url_for('shared_result_pdf', share_id=share_id) }}">Download PDF</a>
+</div>
+{% else %}
+<div class="result-actions">
+    <button type="button" class="st-button secondary action-button" data-action="share-result">Share</button>
+    <button type="button" class="st-button secondary action-button" data-action="download-pdf">Download PDF</button>
+</div>
+<div class="share-link-panel hidden" data-share-panel>
+    <div class="share-link-title">Share link</div>
+    <div class="share-link-row">
+        <input type="text" readonly data-share-link>
+        <button type="button" class="st-button secondary" data-action="copy-share-link">Copy link</button>
+    </div>
+    <div class="st-caption share-retention-note">Only the latest 5 shared results are retained. Creating a 6th share removes the oldest shared result.</div>
+</div>
+{% endif %}
+
 {# Show visible mismatches first, similar to a desktop comparison tool. #}
 {% if result.mismatched_files %}
     <h3 class="st-subheader">Mismatch Details</h3>

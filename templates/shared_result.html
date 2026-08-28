@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shared File Comparison Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+<div class="block-container">
+    <div class="shared-page-heading">
+        <div>
+            <div class="main-title">Shared Comparison Result</div>
+            <div class="sub-title">{{ mode }} - {{ left_label }} vs {{ right_label }}</div>
+        </div>
+        <a class="st-button secondary" href="{{ url_for('index') }}">Open Comparison App</a>
+    </div>
+    <div id="results-area">{{ results_html|safe }}</div>
+</div>
+</div>
+<script>
+(function () {
+    var details = document.querySelectorAll("details.mismatch-panel");
+    Array.prototype.forEach.call(details, function (panel) {
+        panel.addEventListener("toggle", function () {
+            if (!panel.open) return;
+            Array.prototype.forEach.call(details, function (other) {
+                if (other !== panel) other.open = false;
+            });
+        });
+    });
+})();
+</script>
+</body>
+</html>
